@@ -7,6 +7,7 @@
 | `0` | No failing checks |
 | `1` | One or more failing checks |
 | `2` | mcp-smoke itself couldn't run (bad launch command, unreachable URL) |
+| `130` | Interrupted (Ctrl-C); the server process was killed and reaped |
 
 Add `--fail-on-warn` to also fail on warnings.
 
@@ -32,7 +33,7 @@ jobs:
 `action.yml` in this repo is a composite action:
 
 ```yaml
-- uses: SIDDARTHAREDDY8/mcp-smoke@v0.1.0
+- uses: SIDDARTHAREDDY8/mcp-smoke@v1
   with:
     cmd: "node dist/server.js"
     fail-on-warn: "true"
