@@ -81,7 +81,7 @@ mcp-smoke --cmd "node dist/server.js" --json --output smoke.json --fail-on-warn
 Or use the bundled action (see [docs/CI.md](docs/CI.md)):
 
 ```yaml
-- uses: SIDDARTHAREDDY8/mcp-smoke@v0.1.0
+- uses: SIDDARTHAREDDY8/mcp-smoke@v1
   with:
     cmd: "python server.py"
 ```
