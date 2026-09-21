@@ -1,5 +1,6 @@
 name: "MCP smoke test"
 description: "Headless runtime smoke-test for MCP servers (mcp-smoke)"
+author: "Siddartha Reddy Chinthala"
 inputs:
   cmd:
     description: "Server launch command (stdio transport)"
@@ -19,8 +20,8 @@ runs:
   using: "composite"
   steps:
     - run: |
-        pipx install "mcp-smoke @ git+https://github.com/SIDDARTHAREDDY8/mcp-smoke.git@v0.1.0" \
-          || pip install "git+https://github.com/SIDDARTHAREDDY8/mcp-smoke.git@v0.1.0"
+        pipx install "mcp-smoke @ git+https://github.com/SIDDARTHAREDDY8/mcp-smoke.git@v1" \
+          || pip install "git+https://github.com/SIDDARTHAREDDY8/mcp-smoke.git@v1"
         FLAGS="${{ inputs.args }}"
         if [ "${{ inputs.cmd }}" != "" ]; then FLAGS="$FLAGS --cmd \"${{ inputs.cmd }}\""; fi
         if [ "${{ inputs.url }}" != "" ]; then FLAGS="$FLAGS --url \"${{ inputs.url }}\""; fi
