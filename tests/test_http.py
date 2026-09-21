@@ -1,4 +1,5 @@
 """Verify the Streamable HTTP transport against a tiny fixture HTTP server."""
+
 import json
 import os
 import sys
@@ -9,8 +10,8 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from mcp_smoke.client import McpClient  # noqa: E402
-from mcp_smoke.transports import HttpTransport, TransportError  # noqa: E402
+from mcp_smoke.client import McpClient
+from mcp_smoke.transports import HttpTransport, TransportError
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -23,13 +24,21 @@ class Handler(BaseHTTPRequestHandler):
         method = req.get("method")
         req_id = req.get("id")
         if method == "initialize":
-            result = {"protocolVersion": "2025-06-18",
-                      "capabilities": {"tools": {}},
-                      "serverInfo": {"name": "http-fixture", "version": "0.0.1"}}
+            result = {
+                "protocolVersion": "2025-06-18",
+                "capabilities": {"tools": {}},
+                "serverInfo": {"name": "http-fixture", "version": "0.0.1"},
+            }
         elif method == "tools/list":
-            result = {"tools": [{"name": "ping_tool",
-                                 "description": "Replies pong.",
-                                 "inputSchema": {"type": "object"}}]}
+            result = {
+                "tools": [
+                    {
+                        "name": "ping_tool",
+                        "description": "Replies pong.",
+                        "inputSchema": {"type": "object"},
+                    }
+                ]
+            }
         elif method == "tools/call":
             result = {"content": [{"type": "text", "text": "pong"}]}
         elif method == "ping":
@@ -53,7 +62,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
 
-@pytest.fixture()
+@pytest.fixture
 def http_server():
     server = HTTPServer(("127.0.0.1", 0), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -73,7 +82,6 @@ def test_http_initialize_and_tools(http_server):
 
 
 def test_http_method_not_found_surfaces():
-    client = McpClient(HttpTransport("http://127.0.0.1:1/mcp"),
-                       request_timeout=2.0)
+    client = McpClient(HttpTransport("http://127.0.0.1:1/mcp"), request_timeout=2.0)
     with pytest.raises(TransportError):
         client.ping()

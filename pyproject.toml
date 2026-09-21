@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcp-smoke"
-version = "0.1.0"
+version = "0.2.0"
 description = "Headless runtime smoke-tester for MCP servers: catches the silent failures that break agents in production"
 readme = "README.md"
 license = { text = "MIT" }
@@ -16,9 +16,18 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Testing",
 ]
 dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "ty", "coverage"]
 
 [project.urls]
 Homepage = "https://github.com/SIDDARTHAREDDY8/mcp-smoke"
@@ -27,8 +36,86 @@ Issues = "https://github.com/SIDDARTHAREDDY8/mcp-smoke/issues"
 [project.scripts]
 mcp-smoke = "mcp_smoke.cli:main"
 
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "coverage>=7",
+    "ruff>=0.14",
+    "ty>=0.0.80",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_smoke"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["src/mcp_smoke"]
+omit = ["src/mcp_smoke/__main__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise AssertionError",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812",  # trailing comma (formatter handles it)
+    "ISC001",  # implicit string concat (formatter handles it)
+    "CPY001",  # no copyright headers in this project
+    "T201",  # print() is how the CLI reports
+    "EM101",  # raw string in exception: messages are user-facing copy
+    "EM102",  # f-string in exception: messages are user-facing copy
+    "TRY003",  # long messages are the product's UX, not a smell
+    "ANN401",  # Any is correct for JSON-RPC payloads
+    "D100",  # module docstrings optional (most modules have them anyway)
+    "D203",  # incompatible with D211 (ruff keeps D211)
+    "D213",  # incompatible with D212 (ruff keeps D212)
+]
+# Intentional broad catches are the product's core guarantee (no tracebacks
+# ever); they carry per-site noqa comments instead of a global ignore.
+
+[tool.ruff.lint.per-file-ignores]
+"tests/fixtures/*.py" = [
+    "E402",  # fixtures manipulate sys.path to reach the test harness
+]
+"tests/**/*.py" = [
+    "D",  # docstrings optional in tests
+    "ANN",  # annotations optional in tests
+    "S101",  # assert is the test mechanism
+    "PLR2004",  # magic values are fine in test expectations
+    "FBT001",  # boolean args fine in test helpers
+    "FBT002",
+    "S310",  # test HTTP servers are local-only
+    "S105",  # hardcoded test tokens only
+    "ARG",  # unused lambda/fixture args are idiomatic in tests
+    "INP001",  # tests are an implicit namespace package
+    "PTH",  # os.path is fine in tests
+    "PLC0415",  # local imports keep monkeypatch targets obvious
+    "PT018",  # composite assertions read better in tests
+    "SLF001",  # white-box tests exercise private transport helpers directly
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[tool.ty.environment]
+python-version = "3.9"
+
+[tool.ty.src]
+include = ["src"]

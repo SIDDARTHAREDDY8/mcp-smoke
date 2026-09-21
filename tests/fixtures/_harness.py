@@ -1,12 +1,13 @@
 """Minimal raw JSON-RPC stdio MCP server harness for fixtures (stdlib only)."""
+
 import json
 import sys
 
 
 def serve(handlers):
     stdin = sys.stdin
-    for line in stdin:
-        line = line.strip()
+    for raw in stdin:
+        line = raw.strip()
         if not line:
             continue
         try:
@@ -19,15 +20,28 @@ def serve(handlers):
         handler = handlers.get(method)
         if handler is None:
             if req_id is not None:
-                _send({"jsonrpc": "2.0", "id": req_id,
-                       "error": {"code": -32601, "message": f"Method not found: {method}"}})
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": req_id,
+                        "error": {
+                            "code": -32601,
+                            "message": f"Method not found: {method}",
+                        },
+                    }
+                )
             continue
         try:
             result = handler(params)
         except Exception as exc:  # noqa: BLE001 - fixture must stay alive
             if req_id is not None:
-                _send({"jsonrpc": "2.0", "id": req_id,
-                       "error": {"code": -32603, "message": str(exc)}})
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": req_id,
+                        "error": {"code": -32603, "message": str(exc)},
+                    }
+                )
             continue
         if req_id is not None:  # notifications get no response
             _send({"jsonrpc": "2.0", "id": req_id, "result": result})
